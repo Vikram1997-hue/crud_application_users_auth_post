@@ -1,0 +1,5 @@
+# Should ideally write .env here. However, since this is a demo project, we will be
+# pushing our .env file to GitHub (for later reference)
+# *.env
+
+node_modules/
