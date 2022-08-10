@@ -4,7 +4,7 @@ const userRouter = require('./routes/users')
 const authRouter = require('./routes/auth')
 const postRouter = require('./routes/post')
 require('dotenv').config()
-
+app.use(express.json())
 
 
 app.get("/", (req, res) => { //add api as a global route

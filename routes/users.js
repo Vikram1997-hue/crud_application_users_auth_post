@@ -14,6 +14,16 @@ router.put("/put", userController.updateUser)//UPDATE
 
 router.delete("/delete", userController.deleteUser)//DELETE
 
+
+router.put("/login", userController.loginUser) //put cuz only partial modification
+
+router.put("/logout", userController.logoutUser)
+
+router.put("/reset-password", userController.resetPassword)
+
+router.put("/forgot-password", userController.forgotPassword)
+
+
 module.exports = router
 
 
