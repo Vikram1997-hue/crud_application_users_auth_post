@@ -5,15 +5,6 @@ require('dotenv').config()
 
 
 
-//FLAG: USER REGISTRATION + FORGOT PASSWORD PARTS
-/*
-TBH, I don't think separate API's make sense. Create is the same as Registration with Password 
-and Email as compulsory fields. Forgot password doesn't need the old password, so it's the same
-as Update. 
-    However, Change Password requires the old password + authentication that it is in fact the
-correct password + updation. It's partially login, partially updation
-*/
-
 
 function jwtDBUpdate(user, isLogin) {
 
@@ -56,6 +47,36 @@ async function passwordUpdate(newPassword, jwt) {
         }
     })
 }
+
+
+const registration = async (req, res) => {
+
+    if(!req.query.name || !req.query.email || !req.body || !req.body.password || !req.body.confirmPassword) {
+        console.error(new Error("One or more of the required params are missing"))
+        return
+    }
+
+    if(req.body.password.localeCompare(req.body.confirmPassword) != 0) {
+        console.error(new Error("password and confirmPassword must be the same!"))
+        return
+    }
+
+    const hashedPassword = await bcrypt.hash(req.body.password, 10) 
+
+    pool.query(`WITH auto_insert AS(INSERT INTO users(id, name, email, password) 
+    VALUES(uuid_generate_v4(), '${req.query.name}', '${req.query.email}', '${hashedPassword}') returning id)
+    INSERT INTO auth(id, user_id) VALUES(uuid_generate_v4(), (SELECT id FROM auto_insert))`, 
+    (err, result) => {
+        if(err) {
+            console.error("Error in /users/register:", err)
+            return
+        }
+        res.send("Registration successful!")
+    })
+
+}
+
+
 
 const loginUser = async (req, res) => {
 
@@ -317,5 +338,6 @@ module.exports={
     forgotPassword,
     resetPassword,
     loginUser,
-    logoutUser
+    logoutUser,
+    registration
 }

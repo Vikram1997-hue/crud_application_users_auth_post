@@ -23,6 +23,8 @@ router.put("/reset-password", userController.resetPassword)
 
 router.put("/forgot-password", userController.forgotPassword)
 
+router.post("/register", userController.registration)
+
 
 module.exports = router
 

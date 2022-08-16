@@ -3,3 +3,11 @@
 # *.env
 
 node_modules/
+
+
+#future scope - 
+# 1. transaction commit + rollback
+# 2. models folder
+# 3. nodemailer
+# 4. res.send() - proper way to handle
+# 5. VERY IMPORTANT - CODE ORGANIZATION AS PER CONVENTIONS
