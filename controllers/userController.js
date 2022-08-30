@@ -38,7 +38,6 @@ const insertionOriginalScope = async (req, res) => {
         else {
             myUser = await Users.create({name: req.body.name, email: req.body.email, password: hashedPassword, type: req.body.type})
         }
-        console.log(myUser)
 
 
         //auto-insertion into auth 
