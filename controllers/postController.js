@@ -159,6 +159,14 @@ const createPost = (req, res) => {
 
 
 const updatePost = (req, res) => {
+    
+    if(!req.query.id || !req.query.user_id) {
+        console.error(new Error("id and user_id are both required parameters"))
+        return    
+    }
+
+    
+    
     let myQuery = "UPDATE post SET ";
     let commaNeeded = false
     if(req.query.hasOwnProperty('post_title')) {
@@ -170,6 +178,8 @@ const updatePost = (req, res) => {
             myQuery = myQuery + ", "
         myQuery = myQuery + "image = '" + req.query.image + "' "
     }
+    
+
     myQuery = myQuery + "WHERE id = " + req.query.id + " AND user_id = '" + req.query.user_id + "'";
     // res.send(myQuery)
 
