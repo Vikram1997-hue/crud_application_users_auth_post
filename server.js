@@ -1,25 +1,38 @@
 const express = require('express')
 const app = express()
-const userRouter = require('./routes/users')
-const authRouter = require('./routes/auth')
-const postRouter = require('./routes/post')
 require('dotenv').config()
+const userRouter = require("./routes/userRoute")
+const authRouter = require("./routes/authRoute")
+const postRouter = require("./routes/postRoute")
+const indexForModels = require("./models/index")
+const sequelize = require('./util/database')
 app.use(express.json())
 
 
-app.get("/", (req, res) => { //add api as a global route
-    res.send("Heyooo")
+
+
+sequelize.sync({alter: true}).then(result => {
+    console.log("All is well!")
+}).catch(err => {
+    console.error("Error in sequelize.sync() attempt:", err)
 })
 
 
-app.use('/users', userRouter)
-app.use('/auth', authRouter)
-app.use('/post', postRouter)
 
 
-//check for DB connectivity first. NOTE DOWN OPTIMIZATIONS JESUS CHRIST
+app.get("/", (req, res) => {
+    res.send("How's it going, buddy?")
+})
 
-app.listen((process.env.SERVERPORT || 3000), err => {
-    if(err)
-        console.error("Something went wrong:", err)
+app.use("/users", userRouter)
+app.use("/auth", authRouter)
+app.use("/post", postRouter)
+
+
+
+
+app.listen(process.env.SERVER_PORT || 3000, (err) => {
+    if(err) {
+        console.error("Error in server launch:", err)
+    }
 })
