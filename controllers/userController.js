@@ -13,7 +13,7 @@ const bcrypt = require('bcryptjs')
 const getUsers = async (req, res) => {
     
     const ans = await Users.findAll()
-    res.send(ans)
+    res.status(200).send(ans)
 }//SIMPLE READ
 
 
