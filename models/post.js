@@ -1,7 +1,7 @@
-const Sequelize = require('sequelize')
-const sequelize = require("../util/database")
+const Sequelize = require('sequelize');
+const sequelize = require('../util/database');
 
-const Post = sequelize.define("post", {
+const Post = sequelize.define('post', {
     id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -9,7 +9,12 @@ const Post = sequelize.define("post", {
     },
     user_id: {
         type: Sequelize.UUID,
-        // allowNull: false,  //NO POINT WRITING THIS HERE; INSTEAD, DEFINE THIS IN INDEX.JS (WHERE YOU'RE DEFINING YOUR ASSOCIATIONS)
+        /**
+         * NO POINT WRITING THIS HERE; INSTEAD, DEFINE THIS IN INDEX.JS (WHERE YOU'RE
+         * DEFINING YOUR ASSOCIATIONS)
+         */
+
+        // allowNull: false,
         primaryKey: true,
     },
     post_title: {
@@ -21,7 +26,7 @@ const Post = sequelize.define("post", {
     post_status: {
         type: Sequelize.STRING(8),
         defaultValue: 'PENDING',
-    }
+    },
 }, {
     freezeTableName: true,
     timestamps: false,
@@ -29,10 +34,10 @@ const Post = sequelize.define("post", {
     // indexes: [
     //     {
     //         fields: ['user_id', 'id'],
-    //         unique: true,   
+    //         unique: true,
     //         primaryKey: true,
     //     }
     // ]
-})
+});
 
-module.exports = Post
+module.exports = Post;

@@ -1,9 +1,9 @@
-const Sequelize = require('sequelize')
-const sequelize = require("../util/database")
-const Auth = require("./auth")
-const Post = require("./post")
+const Sequelize = require('sequelize');
+const sequelize = require('../util/database');
+const Auth = require('./auth');
+const Post = require('./post');
 
-const Users = sequelize.define("users", {
+const Users = sequelize.define('users', {
     id: {
         type: Sequelize.UUID,
         allowNull: false,
@@ -28,12 +28,12 @@ const Users = sequelize.define("users", {
     },
     jwt: {
         type: Sequelize.TEXT,
-    }
+    },
 }, {
     freezeTableName: true,
     timestamps: false,
     underscored: true,
-})
+});
 
 
 

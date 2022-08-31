@@ -1,7 +1,7 @@
-const Sequelize = require('sequelize')
-const sequelize = require("../util/database")
+const Sequelize = require('sequelize');
+const sequelize = require('../util/database');
 
-const Auth = sequelize.define("auth", {
+const Auth = sequelize.define('auth', {
     id: {
         type: Sequelize.UUID,
         allowNull: false,
@@ -13,14 +13,17 @@ const Auth = sequelize.define("auth", {
     },
     user_id: {
         type: Sequelize.UUID,
-        // allowNull: false, //NO POINT WRITING THIS HERE; INSTEAD, DEFINE THIS IN INDEX.JS (WHERE YOU'RE DEFINING YOUR ASSOCIATIONS)
+        /* NO POINT WRITING THIS HERE; INSTEAD, DEFINE THIS IN INDEX.JS (WHERE YOU'RE DEFINING
+        YOUR ASSOCIATIONS)
+        */
+        // allowNull: false,
         // unique: true,
     },
 }, {
     freezeTableName: true,
     timestamps: false,
     underscored: true,
-})
+});
 
 
 module.exports = Auth;
