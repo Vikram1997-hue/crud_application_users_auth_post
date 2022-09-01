@@ -45,6 +45,10 @@ router.get('/get', userController.getUsers);
  *      '500':
  *        description: Internal Server Error
  */
-router.post('/post', userController.insertionOriginalScope);
+router.post('/post', userController.register);
+
+
+
+
 
 module.exports = router;

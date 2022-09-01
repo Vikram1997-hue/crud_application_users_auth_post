@@ -50,7 +50,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 sequelize.sync({ alter: true }).then((result) => {
     console.log('All is well!');
 }).catch((err) => {
-    console.error('Error in sequelize.sync() attempt:', err);
+    console.error(`Error in sequelize.sync() attempt: ${err} BHAI KA NAAAAAM: ${err.name}`);
 });
 
 
@@ -72,6 +72,6 @@ app.use('/post', postRouter);
 
 app.listen(port, (err) => {
     if (err) {
-        console.error('Error in server launch:', err);
+        console.error(`Error in server launch: ${err}\tBHAI KA NAAAAAM ${err.name}`);
     }
 });
