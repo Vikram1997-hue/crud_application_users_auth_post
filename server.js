@@ -11,20 +11,11 @@ const sequelize = require('./util/database');
 const app = express();
 app.use(express.json());
 
-
 const port = process.env.SERVER_PORT || 3000;
-
-
-
-
 
 app.use('/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/post', postRouter);
-
-
-
-
 
 const swaggerOptions = {
     swaggerDefinition: {
@@ -42,33 +33,23 @@ const swaggerOptions = {
     apis: ['./routes/userRoute.js', './routes/authRoute.js', 'crud_application_users_auth_post/routes/postRoute.js'],
 };
 
-
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // syncing all our models with the actual tables in the database.
-sequelize.sync({ alter: true }).then((result) => {
+sequelize.sync({ alter: true }).then(() => {
     console.log('All is well!');
 }).catch((err) => {
     console.error(`Error in sequelize.sync() attempt: ${err} BHAI KA NAAAAAM: ${err.name}`);
 });
 
-
-
 app.get('/', (req, res) => {
     res.send("How's it going, buddy?");
 });
 
-
-
-
-
 app.use('/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/post', postRouter);
-
-
-
 
 app.listen(port, (err) => {
     if (err) {

@@ -7,6 +7,7 @@ Users.hasOne(Auth, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
     foreignKey: {
+        name: 'user_id',
         allowNull: false,
         unique: true,
     },
@@ -19,8 +20,6 @@ Users.hasMany(Post, {
         primaryKey: true,
     },
 });
-
-
 
 module.exports = {
     Users,

@@ -13,7 +13,7 @@
     },
     "rules": {
         "indent": "off",
-        "no-multiple-empty-lines": "off",
+        // "no-multiple-empty-lines": "off",
         "no-console": 0,
         "keyword-spacing": 0
         // "padded-blocks": ["warning", "never"]

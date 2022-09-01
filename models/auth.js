@@ -9,7 +9,8 @@ const Auth = sequelize.define('auth', {
         defaultValue: Sequelize.UUIDV4,
     },
     phone_number: {
-        type: Sequelize.NUMERIC(10, 0),
+        type: Sequelize.STRING(20),
+        allowNull: false,
     },
     user_id: {
         type: Sequelize.UUID,
@@ -24,6 +25,5 @@ const Auth = sequelize.define('auth', {
     timestamps: false,
     underscored: true,
 });
-
 
 module.exports = Auth;

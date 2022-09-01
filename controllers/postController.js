@@ -11,8 +11,6 @@ const getPost = (req, res) => {
     res.send('Printing all posts');
 };
 
-
-
 module.exports = {
     getPost,
 };

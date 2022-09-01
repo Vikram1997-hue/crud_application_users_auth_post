@@ -35,6 +35,4 @@ const Users = sequelize.define('users', {
     underscored: true,
 });
 
-
-
 module.exports = Users;

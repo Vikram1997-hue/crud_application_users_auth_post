@@ -23,9 +23,24 @@ const register = Joi.object({
         .max(5)
         .uppercase()
         .valid('USER', 'ADMIN'),
+    phone_number: Joi.string()
+        .regex(/\+?(\d*)? ?-? ?\(?(\d{3})\)?[\s-]*(\d{3})[\s-]*(\d{4})/)
+        .required(),
+        /**
+         * Supported phone number formats -
+         *  1234567890
+         *  123 456 7890
+         *  123-456-7890
+         *  123 - 456 - 7890
+         *  (123) 456 7890
+         *  +91 - 1234567890
+         *  +1 - 1234567890
+         *  +911-1234567890
+         *  123     456     7890
+         *  91 (995) 819 6614
+         *  91 123 456 7890
+         */
 });
-
-
 
 // try {
 //     const value = get.validateAsync()

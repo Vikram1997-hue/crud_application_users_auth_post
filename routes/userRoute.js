@@ -3,8 +3,6 @@ const userController = require('../controllers/userController');
 
 const router = express.Router();
 
-
-
 /**
  * @swagger
  * /users/get:
@@ -15,7 +13,6 @@ const router = express.Router();
  *        description: A successful response
  */
 router.get('/get', userController.getUsers);
-
 
 /**
  * @swagger
@@ -46,9 +43,5 @@ router.get('/get', userController.getUsers);
  *        description: Internal Server Error
  */
 router.post('/post', userController.register);
-
-
-
-
 
 module.exports = router;
