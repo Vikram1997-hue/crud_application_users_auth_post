@@ -30,7 +30,7 @@ const swaggerOptions = {
             servers: [`http://localhost:${port}`], // 'http://localhost:'+port
         },
     },
-    apis: ['./routes/userRoute.js', './routes/authRoute.js', 'crud_application_users_auth_post/routes/postRoute.js'],
+    apis: ['server.js', './routes/userRoute.js', './routes/authRoute.js', 'crud_application_users_auth_post/routes/postRoute.js'],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
@@ -43,8 +43,17 @@ sequelize.sync({ alter: true }).then(() => {
     console.error(`Error in sequelize.sync() attempt: ${err} BHAI KA NAAAAAM: ${err.name}`);
 });
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *    description: A simple greeting to check if the server is up
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
 app.get('/', (req, res) => {
-    res.send("How's it going, buddy?");
+    res.status(200).send("How's it going, buddy?");
 });
 
 app.use('/users', userRouter);
