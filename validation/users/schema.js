@@ -42,14 +42,17 @@ const register = Joi.object({
          */
 });
 
-// try {
-//     const value = get.validateAsync()
-// }
-// catch(err){
-//     console.error(err)
-// }
+const login = Joi.object({
+    jwt: Joi.string()
+        .required(),
+    otp: Joi.string()
+        .length(6)
+        .pattern(/^[0-9]+$/)
+        .required(),
+});
 
 module.exports = {
     get,
     register,
+    login,
 };

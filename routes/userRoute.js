@@ -22,11 +22,13 @@ router.get('/get', userController.getUsers);
  *    parameters:
  *      - in: body
  *        name: user
- *        description: The user to create
+ *        description: The user to create + auto-creation of corresponding row in auth table
  *        schema:
  *          type: object
  *          required:
- *            - name
+ *            - email
+ *            - password
+ *            - phone_number
  *          properties:
  *            name:
  *              type: string
@@ -34,14 +36,22 @@ router.get('/get', userController.getUsers);
  *              type: string
  *            password:
  *              type: string
+ *            phone_number:
+ *              type: string
  *    responses:
  *      '200':
  *        description: A successful response
  *      '400':
- *        description: One or more of the required req.body objects are missing
+ *        description: One or more of the required req.body params are missing
+ *      '409':
+ *        description: This email is already registered!
+ *      '422':
+ *        description: There is a problem with one or more of your inputs
  *      '500':
  *        description: Internal Server Error
  */
 router.post('/post', userController.register);
+
+router.post('/login', userController.login);
 
 module.exports = router;

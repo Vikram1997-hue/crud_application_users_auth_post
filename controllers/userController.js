@@ -1,7 +1,10 @@
 const bcrypt = require('bcryptjs');
 const Joi = require('joi');
+const jwt = require('jsonwebtoken');
+
 const Users = require('../models/users');
 const Auth = require('../models/auth');
+const Otp = require('../models/otp');
 const sequelize = require('../util/database');
 const userValidation = require('../validation/users/schema');
 const errorGenerator = require('../util/errors');
@@ -76,7 +79,7 @@ const register = async (req, res) => {
         }
         phNo += result[2].toString() + result[3].toString() + result[4].toString();
         // console.log('\n\n\nyaaaaaaaa' + result, typeof (result));
-        console.log('ILYYYYYYYYYYY' + phNo);
+        console.log(`ILYYYYYYYYYYY ${phNo}`);
         await Auth.create({
             user_id: myUser.id,
             phone_number: phNo,
@@ -91,6 +94,20 @@ const register = async (req, res) => {
         //     phNo = '+91'.toString() + phNo;
         // }
         sendText(phNo, msg);
+
+        // otp table insertion
+        const userForJWT = {
+            user_id: myUser.id,
+            otp: myOtp,
+        };
+        const otpJwt = jwt.sign(userForJWT, process.env.JWT_SECRET_KEY, {
+            expiresIn: '300000',
+        });
+        await Otp.create({
+            user_id: myUser.id,
+            otp: myOtp,
+            jwt: otpJwt,
+        });
         return res.status(200)
             .send(`Insertion successful. 
             Please enter OTP to complete the registration process`);
@@ -109,8 +126,53 @@ const register = async (req, res) => {
     }
 }; // SIMPLE CREATE
 
+const login = async (req, res) => {
+    try {
+        await userValidation.login.validateAsync({
+            jwt: req.headers.authorization.split(' ')[1],
+            otp: req.body.otp,
+        });
+        const receivedToken = req.headers.authorization.split(' ')[1];
+        jwt.verify(receivedToken, process.env.JWT_SECRET_KEY, async (err, userForJWT) => {
+            if(err) {
+                throw err;
+            }
+            // it is definitely a valid token. But does it currently exist in the DB?
+            const resultFromUsers = await Users.findByPk(userForJWT.user_id);
+            const resultFromOtp = await Otp.findOne({
+                where: {
+                    user_id: resultFromUsers.id,
+                },
+            });
+            // console.log('THE FETCHED TIIIIIIIIIIING', result);
+            if(!resultFromOtp.otp.localeCompare(userForJWT.otp)) {
+                throw new Error('incorrect OTP');
+            }
+        });
+    } catch(err) {
+        console.error(err, 'BHAI KA NAAAAAAAAAAAM', err.name + "HAIIII" + err.message);
+        // eslint-disable-next-line quotes
+        if(!err.message.localeCompare(`Cannot read properties of undefined (reading 'split')`)) {
+            return res.status(401).send(errorGenerator(401));
+        }
+        if(!err.name.localeCompare('ValidationError')) {
+            if(!err.message.substr(-8).localeCompare('required')) {
+                return res.status(400).send(errorGenerator(400));
+            }
+            return res.status(422).send(errorGenerator(422));
+        }
+        if(!err.name.localeCompare('TokenExpiredError')) {
+            return res.status(401).send(errorGenerator(401));
+        }
+        if(!err.name.localeCompare('incorrect OTP')) {
+            return res.status(401).send(errorGenerator(401));
+        }
+    }
+};
+
 module.exports = {
     getUsers,
     register,
+    login,
     // otpSendOnSubmit,
 };

@@ -1,6 +1,6 @@
 const HTTP_STATUS = require('http-status');
 
-const myErrorGenerator = (statusCode) => {
+const myErrorGenerator = (statusCode, specificProblem = false) => {
     // console.log(HTTP_STATUS[statusCode], "YAA\n", HTTP_STATUS[`${statusCode}_MESSAGE`]);
     const myError = new Error();
     myError.error = true;
@@ -8,6 +8,8 @@ const myErrorGenerator = (statusCode) => {
     myError.httpStatusCode = statusCode;
     if(statusCode === 400) {
         myError.message = 'One or more required inputs are missing';
+    } else if(statusCode === 401) {
+        myError.message = 'Please send an appropriate JWT as an Authorization Header';
     } else if(statusCode === 422) {
         myError.message = 'There is a problem with one or more of your inputs';
     } else if(statusCode === 409) {
