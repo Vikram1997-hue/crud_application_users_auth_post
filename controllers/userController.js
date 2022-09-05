@@ -18,6 +18,32 @@ const sendText = require('../util/autoTextUtility');
 //     console.error("Error in userController sync attempt:", err)
 // })
 
+setInterval(async () => {
+    const allInOtp = await Users.findAll({
+        include: {
+            model: Otp,
+            required: true,
+        },
+    });
+    // console.log(allInOtp);
+    if(allInOtp.length !== 0) {
+        // eslint-disable-next-line no-restricted-syntax
+        for(const currentUser of allInOtp) {
+            const currentToken = currentUser.dataValues.otp.jwt;
+            // console.log(currentToken);
+            jwt.verify(currentToken, process.env.JWT_SECRET_KEY, async (err) => {
+                if(err && !err.name.localeCompare('TokenExpiredError')) {
+                    await currentUser.destroy();
+                    await currentUser.save();
+                    console.log('deleted inactive');
+                }
+            });
+        }
+    } else {
+        console.log(`I-I-I-I-I'm staying out`);
+    }
+}, 5 * 60 * 1000);
+
 const getUsers = async (req, res) => {
     console.log('PRINTING REQ.QUERY.ID ---->', req.query.id);
 
@@ -48,6 +74,34 @@ const register = async (req, res) => {
             phone_number: req.body.phone_number,
         });
         // console.log(req.body.name, req.body.email, req.body.password);
+
+        // since email uniqueness auto-validates on insertion attempt, we shall check for
+        // ph no. uniqueness. 2-part process:
+        // PART 1: modifying phone_number to match required pattern
+        const result = req.body.phone_number.match(/\+?(\d*)? ?-? ?\(?(\d{3})\)?[\s-]*(\d{3})[\s-]*(\d{4})/);
+        console.log(result);
+        let phNo = '';
+        if(result[1] === undefined) {
+            phNo += '+91';
+        } else{
+            phNo += `+${result[1]}`;
+        }
+        phNo += result[2].toString() + result[3].toString() + result[4].toString();
+        // console.log('\n\n\nyaaaaaaaa' + result, typeof (result));
+        console.log(`ILYYYYYYYYYYY ${phNo}`);
+
+        // PART 2: checking if this phone_number is in the table
+        const phoneAlreadyExists = await Auth.findOne({
+            where: {
+                phone_number: phNo,
+            },
+        });
+        if(phoneAlreadyExists != null) {
+            const myErr = new Error('Already in auth');
+            myErr.name = 'Already in auth';
+            throw myErr;
+        }
+
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         console.log('PRINTING HASH:', hashedPassword);
         let myUser;
@@ -69,17 +123,6 @@ const register = async (req, res) => {
         await myUser.save();
 
         // auto-insertion into auth
-        const result = req.body.phone_number.match(/\+?(\d*)? ?-? ?\(?(\d{3})\)?[\s-]*(\d{3})[\s-]*(\d{4})/);
-        console.log(result);
-        let phNo = '';
-        if(result[1] === undefined) {
-            phNo += '+91';
-        } else{
-            phNo += `+${result[1]}`;
-        }
-        phNo += result[2].toString() + result[3].toString() + result[4].toString();
-        // console.log('\n\n\nyaaaaaaaa' + result, typeof (result));
-        console.log(`ILYYYYYYYYYYY ${phNo}`);
         await Auth.create({
             user_id: myUser.id,
             phone_number: phNo,
@@ -118,6 +161,10 @@ const register = async (req, res) => {
             }
             return res.status(422).send(errorGenerator(422));
         }
+        if(!err.name.localeCompare('Already in auth')) {
+            console.log('Ghus gaya bhaaaaaaaaaaaaaaaai');
+            return res.status(409).send(errorGenerator(409));
+        }
         if(!err.name.localeCompare('SequelizeUniqueConstraintError')) {
             return res.status(409).send(errorGenerator(409));
         }
@@ -126,34 +173,64 @@ const register = async (req, res) => {
     }
 }; // SIMPLE CREATE
 
-const login = async (req, res) => {
+const otpVerification = async (req, res) => {
     try {
-        await userValidation.login.validateAsync({
+        await userValidation.otpVerif.validateAsync({
             jwt: req.headers.authorization.split(' ')[1],
             otp: req.body.otp,
         });
         const receivedToken = req.headers.authorization.split(' ')[1];
-        jwt.verify(receivedToken, process.env.JWT_SECRET_KEY, async (err, userForJWT) => {
+        let resultFromUsers;
+        let resultFromOtp;
+        await jwt.verify(receivedToken, process.env.JWT_SECRET_KEY, async (err, userForJWT) => {
             if(err) {
+                console.log("YAAAAAAAAAAAAAAS", err.name, "AAAAND", err.message, "YPPPPP");
                 throw err;
             }
+            // console.log('PRINTING OUR GUUUUUUUUUUY', userForJWT);
             // it is definitely a valid token. But does it currently exist in the DB?
-            const resultFromUsers = await Users.findByPk(userForJWT.user_id);
-            const resultFromOtp = await Otp.findOne({
+            resultFromUsers = await Users.findByPk(userForJWT.user_id);
+            console.log('PEHLAAAAAAAAA', resultFromUsers);
+            resultFromOtp = await Otp.findOne({
                 where: {
                     user_id: resultFromUsers.id,
                 },
             });
-            // console.log('THE FETCHED TIIIIIIIIIIING', result);
-            if(!resultFromOtp.otp.localeCompare(userForJWT.otp)) {
-                throw new Error('incorrect OTP');
-            }
+            console.log('DOOOOOOSRA', resultFromOtp.dataValues);
         });
+        // console.log('DEBUGGINGGGG', resultFromOtp.dataValues.otp);
+        // console.log('THE FETCHED TIIIIIIIIIIING', result);
+        if(resultFromOtp.dataValues.otp.localeCompare(req.body.otp)) {
+            const myErr = new Error('Incorrect OTP');
+            myErr.name = 'Incorrect OTP';
+            // console.log('GHUSAAAAAAAAAAAA PART 1');
+            await resultFromOtp.destroy();
+            await resultFromOtp.save();
+            await resultFromUsers.destroy();
+            await resultFromUsers.save();
+            throw myErr;
+        }
+        // now OTP is correct, so...
+        await resultFromOtp.destroy();
+        await resultFromOtp.save();
+        resultFromUsers.isVerified = true;
+        await resultFromUsers.save();
+        res.status(200).send('Verification complete! Your account has been successfully created');
     } catch(err) {
         console.error(err, 'BHAI KA NAAAAAAAAAAAM', err.name + "HAIIII" + err.message);
         // eslint-disable-next-line quotes
-        if(!err.message.localeCompare(`Cannot read properties of undefined (reading 'split')`)) {
+        if(!err.name.localeCompare('Incorrect OTP')) {
+            // console.log("GHUS GAYA BHAI PARTYYYYYYYYYYY");
+            return res.status(401).send(errorGenerator(401, 'Incorrect OTP. Re-register please.'));
+        }
+        if(!err.name.localeCompare('JsonWebTokenError')) {
             return res.status(401).send(errorGenerator(401));
+        }
+        if(!err.message.substr(0, 16).localeCompare('Unexpected token')) {
+            return res.status(401).send(errorGenerator(401));
+        }
+        if(!err.message.localeCompare(`Cannot read properties of undefined (reading 'split')`)) {
+            return res.status(401).send(errorGenerator(401, 'JWT can not be null'));
         }
         if(!err.name.localeCompare('ValidationError')) {
             if(!err.message.substr(-8).localeCompare('required')) {
@@ -162,17 +239,20 @@ const login = async (req, res) => {
             return res.status(422).send(errorGenerator(422));
         }
         if(!err.name.localeCompare('TokenExpiredError')) {
+            return res.status(401).send(errorGenerator(401, 'Your OTP has expired! Please register again.'
+            + ' If you missed your 5 minute window to enter your OTP, you must wait for an '
+            + 'additional 5 minutes until you can retry'));
+        }
+        if(!err.name.localeCompare('JsonWebTokenError')) {
             return res.status(401).send(errorGenerator(401));
         }
-        if(!err.name.localeCompare('incorrect OTP')) {
-            return res.status(401).send(errorGenerator(401));
-        }
+        return res.status(500).send(errorGenerator(500));
     }
 };
 
 module.exports = {
     getUsers,
     register,
-    login,
+    otpVerification,
     // otpSendOnSubmit,
 };

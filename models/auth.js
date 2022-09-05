@@ -11,6 +11,7 @@ const Auth = sequelize.define('auth', {
     phone_number: {
         type: Sequelize.STRING(20),
         allowNull: false,
+        unique: true,
     },
     user_id: {
         type: Sequelize.UUID,

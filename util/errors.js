@@ -9,11 +9,16 @@ const myErrorGenerator = (statusCode, specificProblem = false) => {
     if(statusCode === 400) {
         myError.message = 'One or more required inputs are missing';
     } else if(statusCode === 401) {
-        myError.message = 'Please send an appropriate JWT as an Authorization Header';
+        if(specificProblem) {
+            myError.message = specificProblem;
+        } else {
+            myError.message = 'Please send an appropriate JWT as an Authorization Header';
+        }
     } else if(statusCode === 422) {
         myError.message = 'There is a problem with one or more of your inputs';
     } else if(statusCode === 409) {
-        myError.message = 'This email is already registered!';
+        myError.message = 'This email or phone number is already registered! If you are trying to '
+        + 're-register because you failed to enter OTP timely, please try again after 5 minutes';
     } else if(statusCode === 500) {
         myError.message = HTTP_STATUS[`${statusCode}_MESSAGE`];
     }

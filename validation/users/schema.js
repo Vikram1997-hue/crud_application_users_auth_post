@@ -42,7 +42,7 @@ const register = Joi.object({
          */
 });
 
-const login = Joi.object({
+const otpVerif = Joi.object({
     jwt: Joi.string()
         .required(),
     otp: Joi.string()
@@ -54,5 +54,5 @@ const login = Joi.object({
 module.exports = {
     get,
     register,
-    login,
+    otpVerif,
 };

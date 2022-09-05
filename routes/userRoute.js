@@ -44,7 +44,8 @@ router.get('/get', userController.getUsers);
  *      '400':
  *        description: One or more of the required req.body params are missing
  *      '409':
- *        description: This email is already registered!
+ *        description: This email is already registered! If you're trying to re-register
+ *                     because you failed to enter OTP timely, please try again after 5 minutes
  *      '422':
  *        description: There is a problem with one or more of your inputs
  *      '500':
@@ -52,6 +53,40 @@ router.get('/get', userController.getUsers);
  */
 router.post('/post', userController.register);
 
-router.post('/login', userController.login);
+/**
+ * @swagger
+ * /users/otpVerify:
+ *   post:
+ *    description: OTP verification upon sign-up. If you miss your 5 minute window to
+ *                 enter your OTP, you must wait for an additional 5 minutes until you can retry
+ *    parameters:
+ *      - in: body
+ *        name: otp
+ *        description: The OTP received on registered email ID and phone number
+ *        schema:
+ *          type: object
+ *          required:
+ *            - otp
+ *          properties:
+ *            otp:
+ *              type: string
+ *      - in: header
+ *        name: Authorization
+ *        description: JWT token for OTP
+ *        required: Authorization
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ *      '400':
+ *        description: One or more of the required req.body params are missing
+ *      '401':
+ *        description: Authentication-related error. Please look at the error object sent in
+ *                     response for more details
+ *      '422':
+ *        description: There is a problem with one or more of your inputs
+ *      '500':
+ *        description: Internal Server Error
+ */
+router.post('/otpVerify', userController.otpVerification);
 
 module.exports = router;

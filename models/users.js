@@ -29,6 +29,10 @@ const Users = sequelize.define('users', {
     jwt: {
         type: Sequelize.TEXT,
     },
+    isVerified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: 'false',
+    },
 }, {
     freezeTableName: true,
     timestamps: false,
