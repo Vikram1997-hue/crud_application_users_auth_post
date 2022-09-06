@@ -6,14 +6,20 @@ const myErrorGenerator = (statusCode, specificProblem = false) => {
     myError.error = true;
     myError.name = HTTP_STATUS[statusCode];
     myError.httpStatusCode = statusCode;
+    if(specificProblem) {
+        myError.message = specificProblem;
+        return myError;
+    }
     if(statusCode === 400) {
         myError.message = 'One or more required inputs are missing';
     } else if(statusCode === 401) {
-        if(specificProblem) {
-            myError.message = specificProblem;
-        } else {
-            myError.message = 'Please send an appropriate JWT as an Authorization Header';
-        }
+        myError.message = 'Please send an appropriate JWT as an Authorization Header';
+    } else if(statusCode === 403) {
+        myError.message = 'Incorrect password entered!';
+    } else if(statusCode === 404) {
+        myError.message = 'This email has not been registered!';
+    } else if(statusCode === 405) {
+        myError.message = 'You cannot login until you have verified your account with OTP';
     } else if(statusCode === 422) {
         myError.message = 'There is a problem with one or more of your inputs';
     } else if(statusCode === 409) {

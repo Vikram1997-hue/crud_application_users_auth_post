@@ -7,10 +7,10 @@ const sequelize = require('../util/database');
 //     console.error("Error in Sequelize sync attempt", err)
 // })
 
-const getPost = (req, res) => {
-    res.send('Printing all posts');
+const createPost = (req, res) => {
+
 };
 
 module.exports = {
-    getPost,
+    createPost,
 };

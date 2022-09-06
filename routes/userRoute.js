@@ -89,4 +89,65 @@ router.post('/post', userController.register);
  */
 router.post('/otpVerify', userController.otpVerification);
 
+/**
+ * @swagger
+ * /users/login:
+ *   put:
+ *    description: Log in to your account
+ *    parameters:
+ *      - in: body
+ *        name: credentials
+ *        description: The email ID and password associated with your account
+ *        schema:
+ *          type: object
+ *          required:
+ *            - email
+ *            - password
+ *          properties:
+ *            email:
+ *              type: string
+ *            password:
+ *              type: string
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ *      '400':
+ *        description: One or more of the required req.body params are missing
+ *      '403':
+ *        description: Incorrect password
+ *      '404':
+ *        description: This email ID has not been registered
+ *      '405':
+ *        description: You cannot login until you have verified your account with OTP
+ *      '422':
+ *        description: There is a problem with one or more of your inputs
+ *      '500':
+ *        description: Internal Server Error
+ */
+router.put('/login', userController.login);
+
+/**
+ * @swagger
+ * /users/logout:
+ *   put:
+ *    description: Log out of your account
+ *    parameters:
+ *      - in: header
+ *        name: Authorization
+ *        description: The JWT token associated with your login session
+ *        required: Authorization
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ *      '400':
+ *        description: The required parameter is missing
+ *      '401':
+ *        description: You are already logged out
+ *      '422':
+ *        description: There is a problem with one or more of your inputs
+ *      '500':
+ *        description: Internal Server Error
+ */
+router.put('/logout', userController.logout);
+
 module.exports = router;

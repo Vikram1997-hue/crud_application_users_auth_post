@@ -155,6 +155,7 @@ const register = async (req, res) => {
             .send(`Insertion successful. 
             Please enter OTP to complete the registration process`);
     } catch(err) {
+        console.log('YAAAAAAAAAAAAAAAAAAA', err, 'HAIIIIIII', err.name);
         if(!err.name.localeCompare('ValidationError')) {
             if(!err.message.substr(-8).localeCompare('required')) {
                 return res.status(400).send(errorGenerator(400));
@@ -250,9 +251,107 @@ const otpVerification = async (req, res) => {
     }
 };
 
+const login = async (req, res) => {
+    try {
+        await userValidation.login.validateAsync({
+            email: req.body.email,
+            password: req.body.password,
+        });
+        const currentUser = await Users.findOne({
+            where: {
+                email: req.body.email,
+            },
+        });
+        if(currentUser == null) {
+            const err = new Error('This email ID has not been registered!');
+            err.name = 'This email ID has not been registered!';
+            throw err;
+        }
+        const passwordCorrect = await bcrypt.compare(req.body.password, currentUser.password);
+        if(!passwordCorrect) {
+            const e = new Error('Incorrect password');
+            e.name = 'Incorrect password';
+            throw e;
+        }
+        if(currentUser.isVerified === false) {
+            const e = new Error('You cannot login until you have verified your account with OTP');
+            e.name = 'You cannot login until you have verified your account with OTP';
+            throw e;
+        }
+        const userForJWT = {
+            id: currentUser.id,
+            type: currentUser.type,
+        };
+        const currentSessionJWT = await jwt.sign(userForJWT, process.env.JWT_SECRET_KEY, {
+            expiresIn: '600000',
+        });
+        currentUser.jwt = currentSessionJWT;
+        await currentUser.save();
+        return res.status(200).send('You have successfully logged in!');
+    } catch(err) {
+        console.log('THE ERROR ISSSSSSSSSSSSS', err, 'NAAAAAAAAAM', err.name);
+        if(!err.name.localeCompare('Incorrect password')) {
+            return res.status(403).send(errorGenerator(403));
+        }
+        if(!err.name.localeCompare('ValidationError')) {
+            if(!err.message.substr(-8).localeCompare('required')) {
+                return res.status(400).send(errorGenerator(400));
+            }
+            return res.status(422).send(errorGenerator(422));
+        }
+        if(!err.name.localeCompare('This email ID has not been registered!')) {
+            return res.status(404).send(errorGenerator(404));
+        }
+        if(!err.name.localeCompare('You cannot login until you have verified your account with OTP')) {
+            return res.status(405).send(errorGenerator(405));
+        }
+        return res.status(500).send(errorGenerator(500));
+    }
+};
+
+const logout = async (req, res) => {
+    try {
+        await userValidation.logout.validateAsync({
+            jwt: req.headers.authorization.split(' ')[1],
+        });
+        const receivedToken = req.headers.authorization.split(' ')[1];
+        await jwt.verify(receivedToken, process.env.JWT_SECRET_KEY, async (err, userForJWT) => {
+            if(err) {
+                throw err;
+            }
+            const currentUser = await Users.findByPk(userForJWT.id);
+            if(currentUser.jwt == null) {
+                const e = new Error('already logged out');
+                e.name = 'already logged out';
+                throw e;
+            }
+            currentUser.jwt = null;
+            await currentUser.save();
+            return res.status(200).send('You are now logged out!');
+        });
+    } catch(err) {
+        console.log('THE ERROR ISSSSSSSSSS', err, 'NAAAAAAAAAM', err.name);
+        if(!err.name.localeCompare('TokenExpiredError')) {
+            return res.status(401).send(errorGenerator(401, 'You have been auto-logged out. Please log in again'));
+        }
+        if(!err.name.localeCompare('ValidationError')) {
+            if(!err.message.substr(-8).localeCompare('required')) {
+                return res.status(400).send(errorGenerator(400));
+            }
+            return res.status(422).send(errorGenerator(422));
+        }
+        if(!err.name.localeCompare('already logged out')) {
+            return res.status(401).send(errorGenerator(401, 'You are already logged out'));
+        }
+        return res.status(500).send(errorGenerator(500));
+    }
+};
+
 module.exports = {
     getUsers,
     register,
     otpVerification,
-    // otpSendOnSubmit,
+    login,
+    logout,
+    // resendOTP,
 };

@@ -1,3 +1,4 @@
+/* eslint-disable prefer-regex-literals */
 const Joi = require('joi');
 
 const get = Joi.object({
@@ -7,8 +8,9 @@ const get = Joi.object({
 
 const register = Joi.object({
     name: Joi.string()
-        .regex(/[A-Z]?([a-z]+|[A-Z]+)( ([A-Z]|[a-z]))?([a-z]+)/)
-        .max(30),
+        .regex(RegExp(/[A-Z]?([a-z]+|[A-Z]+)( ([A-Z]|[a-z]))?([a-z]+)/))
+        .max(30)
+        .required(),
     email: Joi.string()
         .regex(/([a-z][0-9]?[_|.]?).+@appventurez.com$/)
         .min(17)
@@ -51,8 +53,28 @@ const otpVerif = Joi.object({
         .required(),
 });
 
+const login = Joi.object({
+    email: Joi.string()
+        .regex(/([a-z][0-9]?[_|.]?).+@appventurez.com$/)
+        .min(17)
+        .max(40)
+        .lowercase()
+        .required(),
+    password: Joi.string()
+        .min(8)
+        .max(20)
+        .required(),
+});
+
+const logout = Joi.object({
+    jwt: Joi.string()
+    .required(),
+});
+
 module.exports = {
     get,
     register,
     otpVerif,
+    login,
+    logout,
 };
