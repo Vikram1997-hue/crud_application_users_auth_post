@@ -8,7 +8,8 @@ const get = Joi.object({
 
 const register = Joi.object({
     name: Joi.string()
-        .regex(RegExp(/[A-Z]?([a-z]+|[A-Z]+)( ([A-Z]|[a-z]))?([a-z]+)/))
+        // .regex(RegExp(/[A-Z]?([a-z]+|[A-Z]+)( ([A-Z]|[a-z]))?([a-z]+)/))
+        .pattern(new RegExp('[A-Z]?([a-z]+|[A-Z]+)( ([A-Z]|[a-z]))?([a-z]+)'))
         .max(30)
         .required(),
     email: Joi.string()

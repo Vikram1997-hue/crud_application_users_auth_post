@@ -8,7 +8,7 @@ const sequelize = require('../util/database');
 // })
 
 const createPost = (req, res) => {
-
+    res.send('SUp');
 };
 
 module.exports = {
