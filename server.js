@@ -20,7 +20,7 @@ app.use('/post', postRouter);
 const swaggerOptions = {
     swaggerDefinition: {
         info: {
-            title: 'CRUD API Assignment with Sequelize',
+            title: 'Mini-Instagram Clone',
             descrption: 'Has 3 tables: users, auth, and post',
             version: '1.0.0',
             contact: {
@@ -30,7 +30,7 @@ const swaggerOptions = {
             servers: [`http://localhost:${port}`], // 'http://localhost:'+port
         },
     },
-    apis: ['server.js', './routes/userRoute.js', './routes/authRoute.js', 'crud_application_users_auth_post/routes/postRoute.js'],
+    apis: ['server.js', './routes/userRoute.js', './routes/authRoute.js', './routes/postRoute.js'],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

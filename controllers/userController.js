@@ -72,6 +72,7 @@ const register = async (req, res) => {
             email: req.body.email,
             password: req.body.password,
             phone_number: req.body.phone_number,
+            type: req.body.type,
         });
         // console.log(req.body.name, req.body.email, req.body.password);
 
@@ -185,7 +186,7 @@ const otpVerification = async (req, res) => {
         let resultFromOtp;
         await jwt.verify(receivedToken, process.env.JWT_SECRET_KEY, async (err, userForJWT) => {
             if(err) {
-                console.log("YAAAAAAAAAAAAAAS", err.name, "AAAAND", err.message, "YPPPPP");
+                console.log('YAAAAAAAAAAAAAAS', err.name, 'AAAAND', err.message, 'YPPPPP');
                 throw err;
             }
             // console.log('PRINTING OUR GUUUUUUUUUUY', userForJWT);
@@ -218,7 +219,7 @@ const otpVerification = async (req, res) => {
         await resultFromUsers.save();
         res.status(200).send('Verification complete! Your account has been successfully created');
     } catch(err) {
-        console.error(err, 'BHAI KA NAAAAAAAAAAAM', err.name + "HAIIII" + err.message);
+        console.error(err, 'BHAI KA NAAAAAAAAAAAM', err.name + 'HAIIII' + err.message);
         // eslint-disable-next-line quotes
         if(!err.name.localeCompare('Incorrect OTP')) {
             // console.log("GHUS GAYA BHAI PARTYYYYYYYYYYY");
@@ -283,7 +284,7 @@ const login = async (req, res) => {
             type: currentUser.type,
         };
         const currentSessionJWT = await jwt.sign(userForJWT, process.env.JWT_SECRET_KEY, {
-            expiresIn: '600000',
+            expiresIn: '600000', // 10 minutes
         });
         currentUser.jwt = currentSessionJWT;
         await currentUser.save();

@@ -38,6 +38,8 @@ router.get('/get', userController.getUsers);
  *              type: string
  *            phone_number:
  *              type: string
+ *            type:
+ *              type: string
  *    responses:
  *      '200':
  *        description: A successful response

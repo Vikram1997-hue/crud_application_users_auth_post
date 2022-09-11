@@ -17,6 +17,7 @@ Users.hasMany(Post, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
     foreignKey: {
+        name: 'user_id',
         allowNull: false,
         primaryKey: true,
     },

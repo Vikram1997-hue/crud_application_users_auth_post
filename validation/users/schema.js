@@ -8,12 +8,12 @@ const get = Joi.object({
 
 const register = Joi.object({
     name: Joi.string()
-        // .regex(RegExp(/[A-Z]?([a-z]+|[A-Z]+)( ([A-Z]|[a-z]))?([a-z]+)/))
-        .pattern(new RegExp('[A-Z]?([a-z]+|[A-Z]+)( ([A-Z]|[a-z]))?([a-z]+)'))
+        .regex(RegExp(/^[A-Z]?([a-z]+|[A-Z]+)( ([A-Z]|[a-z]))?([a-z]+)$/))
+        // .pattern(new RegExp('[A-Z]?([a-z]+|[A-Z]+)( ([A-Z]|[a-z]))?([a-z]+)'))
         .max(30)
         .required(),
     email: Joi.string()
-        .regex(/([a-z][0-9]?[_|.]?).+@appventurez.com$/)
+        .regex(/^([a-z]+(([^@]([0-9]|[a-z])+)([1-9]+)?)+)(@appventurez+(.com)+)$/)
         .min(17)
         .max(40)
         .lowercase()
@@ -62,8 +62,8 @@ const login = Joi.object({
         .lowercase()
         .required(),
     password: Joi.string()
-        .min(8)
-        .max(20)
+        // .min(8)
+        // .max(20)
         .required(),
 });
 

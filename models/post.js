@@ -3,9 +3,11 @@ const sequelize = require('../util/database');
 
 const Post = sequelize.define('post', {
     id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         allowNull: false,
-        primaryKey: 'huehuehue',
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
+        // primaryKey: 'huehuehue',
     },
     user_id: {
         type: Sequelize.UUID,
@@ -19,6 +21,7 @@ const Post = sequelize.define('post', {
     },
     post_title: {
         type: Sequelize.STRING(30),
+        allowNull: false,
     },
     image: {
         type: Sequelize.TEXT,
